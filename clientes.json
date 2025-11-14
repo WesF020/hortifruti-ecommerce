@@ -1,19 +1,22 @@
-{
-    "lista_clientes": [
-        {
-            "cliente_cpf": 18934582798,
-            "nome_cliente": "Bruno",
-            "idade_cliente": 19
-        },
-        {
-            "cliente_cpf": 29817519488,
-            "nome_cliente": "Miguel",
-            "idade_cliente": 21
-        },
-        {
-            "cliente_cpf": 18020377519,
-            "nome_cliente": "Eduarda",
-            "idade_cliente": 18
-        }
-    ]
-}
+[
+  {
+    "nome": "Bruno",
+    "cpf": "18934582798",
+    "idade": 19
+  },
+  {
+    "nome": "Miguel",
+    "cpf": "29817519488",
+    "idade": 21
+  },
+  {
+    "nome": "Eduarda",
+    "cpf": "18020377519",
+    "idade": 18
+  },
+  {
+    "nome": "Daniel Paulista",
+    "cpf": "12332113211",
+    "idade": 50
+  }
+]

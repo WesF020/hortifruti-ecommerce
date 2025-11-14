@@ -6,7 +6,7 @@ ARQUIVOS = {'clientes': 'clientes.json',
             'produtos': 'produtos.json'
             }
 
-# Talvez tenha que estar dentro da função(ou não)
+
 dados = {'clientes': [], 'produtos': []}
 
 # ----- Carregar e Salvar Dados-----
@@ -32,9 +32,12 @@ def salvar_dados(dados):
     for chave, nome_arquivo in ARQUIVOS.items():
         try:
             with open(nome_arquivo, 'w', encoding='utf-8') as f:
-                json.dump(dados[chave], f, ensure_ascii=false, indent=2)
+                json.dump(dados[chave], f, ensure_ascii=False, indent=2)
         except Exception as e:
             print(f'Erro ao salvar {nome_arquivo}:{e}')
+
+
+carregar_dados(dados)  # carregar os dados ao iniciar o programa
 
 
 # -----Menu Relatórios-----
@@ -122,7 +125,7 @@ def cadastrar_clientes(dados):
     nome = input('Digite o nome: ').strip()
 
     while True:
-        cpf = (input('Digite o CPF(deve conter 11 dígitos): '))
+        cpf = (input('Digite o CPF(deve conter 11 dígitos): ')).strip()
         if not cpf.isdigit() or len(cpf) != 11:
             print('CPF inválido, digite 11 números.')
             continue
@@ -139,6 +142,7 @@ def cadastrar_clientes(dados):
 
     dados['clientes'].append({'nome': nome, 'cpf': cpf, 'idade': idade})
 
+    salvar_dados(dados)
     print('Cliente cadstrado com sucesso!')
 
 
@@ -175,6 +179,7 @@ def menu_produtos():
 while True:
     print('==== Sistema de estoque - Hortifruti ==== ')
     print('[1]- Clientes ')
+    print('[2]- produtos')
     print('[3]- Vendas')
     print('[4]- Relatórios')
     print('[0]- Sair')
@@ -184,7 +189,7 @@ while True:
     if opcao == 1:
         menu_clientes(dados)
     elif opcao == 2:
-        menu_produtos()
+        menu_produtos(dados)
     elif opcao == 3:
         menu_vendas(dados)
     elif opcao == 4:
@@ -193,5 +198,6 @@ while True:
         print('Salvando dados')
         salvar_dados(dados)
         print('Dados salvos, programa encerrado')
+        break
     else:
         print('Opção inválida')
