@@ -1,3 +1,42 @@
+import json
+import os
+from datetime import datetime
+
+ARQUIVOS = {'clientes': 'clientes.json',
+            'produtos': 'produtos.json'
+            }
+
+# Talvez tenha que estar dentro da função(ou não)
+dados = {'clientes': [], 'produtos': []}
+
+# ----- Carregar e Salvar Dados-----
+
+
+def carregar_dados(dados):
+
+    for chave, nome_arquivo in ARQUIVOS.items():
+        if os.path.exists(nome_arquivo):
+            try:
+                with open(nome_arquivo, 'r', encoding='utf-8') as f:
+                    dados[chave] = json.load(f)
+            except Exception:
+                print(
+                    f'AVISO: Não foi possível ler o arquivo {nome_arquivo}. Criando listas vazias.')
+                dados[chave] = []
+        else:
+            dados[chave] = []
+    return dados
+
+
+def salvar_dados(dados):
+    for chave, nome_arquivo in ARQUIVOS.items():
+        try:
+            with open(nome_arquivo, 'w', encoding='utf-8') as f:
+                json.dump(dados[chave], f, ensure_ascii=false, indent=2)
+        except Exception as e:
+            print(f'Erro ao salvar {nome_arquivo}:{e}')
+
+
 # -----Menu Relatórios-----
 
 def menu_relatorios():
@@ -49,7 +88,7 @@ def menu_vendas():
 
 # -----Menu Clientes-----
 
-def menu_clientes():
+def menu_clientes(dados):
     while True:
         print('===Menu Clientes===')
         print('[1]- Cadastrar cliente')
@@ -62,7 +101,7 @@ def menu_clientes():
         opcao = int(input('>'))
 
         if opcao == 1:
-            cadastrar_clientes()
+            cadastrar_clientes(dados)
         elif opcao == 2:
             buscar_clientecpf()
         elif opcao == 3:
@@ -75,6 +114,32 @@ def menu_clientes():
             return
         else:
             print('Opção inválida')
+
+
+def cadastrar_clientes(dados):
+
+    print('----Cadastrar Clientes----')
+    nome = input('Digite o nome: ').strip()
+
+    while True:
+        cpf = (input('Digite o CPF(deve conter 11 dígitos): '))
+        if not cpf.isdigit() or len(cpf) != 11:
+            print('CPF inválido, digite 11 números.')
+            continue
+        if any(c['cpf'] == cpf for c in dados['clientes']):
+            print('Já existe um cliente cadastrado com este CPF')
+            return
+        break
+
+    idade = int(input('Digite a idade: '))
+
+    if idade < 18:
+        print('Somente maiores de idade podem ser cadastrados.')
+        return
+
+    dados['clientes'].append({'nome': nome, 'cpf': cpf, 'idade': idade})
+
+    print('Cliente cadstrado com sucesso!')
 
 
 #   -----Menu Produtos-----
@@ -110,7 +175,6 @@ def menu_produtos():
 while True:
     print('==== Sistema de estoque - Hortifruti ==== ')
     print('[1]- Clientes ')
-    print('[2]- Produtos ')
     print('[3]- Vendas')
     print('[4]- Relatórios')
     print('[0]- Sair')
@@ -118,17 +182,16 @@ while True:
     opcao = int(input('>'))
 
     if opcao == 1:
-        menu_clientes()  # Função que abre o menu de clientes
+        menu_clientes(dados)
     elif opcao == 2:
-        menu_produtos()  # função que abre o menu de produtos
+        menu_produtos()
     elif opcao == 3:
-        menu_vendas()  # função que abre o menu de vendas
+        menu_vendas(dados)
     elif opcao == 4:
-        menu_relatorios()     # função que abre o menu de relatórios
+        menu_relatorios(dados)
     elif opcao == 0:
-        print('Salvando dados...')
-        salvar_dados()  # função responsável por salvar os dados no arquivo .JSON
-        print('Dados salvos, programa encerrado.')
-        break
+        print('Salvando dados')
+        salvar_dados(dados)
+        print('Dados salvos, programa encerrado')
     else:
-        print('Opção inválida.')
+        print('Opção inválida')
