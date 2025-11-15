@@ -222,7 +222,7 @@ def cadastro_produtos(dados):
 
     salvar_dados(dados)
 
-    print(f"\n✅ Produto cadastrado com sucesso!")
+    print(f"\n Produto cadastrado com sucesso!")
     print(f"   Nome: {novo_produto}")
     print(f"   ID: {id_do_produto}")
     print(f"   Preço: R$ {preco_do_produto}")
@@ -373,3 +373,4 @@ while True:
         break
     else:
         print('Opção inválida')
+
