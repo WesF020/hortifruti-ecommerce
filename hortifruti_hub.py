@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+
 
 ARQUIVOS = {'clientes': 'clientes.json',
             'produtos': 'produtos.json'
@@ -106,13 +106,13 @@ def menu_clientes(dados):
         if opcao == 1:
             cadastrar_clientes(dados)
         elif opcao == 2:
-            buscar_clientecpf()
+            buscar_clientecpf(dados)
         elif opcao == 3:
-            atualizar_cliente()
+            atualizar_cliente(dados)
         elif opcao == 4:
-            excluir_cliente()
+            excluir_cliente(dados)
         elif opcao == 5:
-            lista_de_clientes()
+            lista_de_clientes(dados)
         elif opcao == 0:
             return
         else:
@@ -146,6 +146,145 @@ def cadastrar_clientes(dados):
     print('Cliente cadstrado com sucesso!')
 
 
+def buscar_clientecpf(dados):
+
+    print('-----Buscar clientes por CPF-----')
+    cpf = input('Digite o CPF: ').strip()
+
+    for c in dados['clientes']:
+        if c['cpf'] == cpf:
+            print(
+                f'Encontrado {c['nome']} | CPF: {c['cpf']} | Idade: {c['idade']}')
+            return
+    print('Cliente não encontrado.')
+
+
+def atualizar_cliente(dados):
+
+    print('----Atualizar Cliente----')
+
+    if not dados['clientes']:
+        print("Nenhum cliente cadastrado para atualizar.")
+        return
+
+    print("\nClientes cadastrados:\n")
+    for cliente in dados['clientes']:
+        print(
+            f"| Nome: {cliente['nome']} | CPF: {cliente['cpf']} | Idade: {cliente['idade']}")
+
+    while True:
+        cpf = input("\nDigite o CPF do cliente que deseja atualizar: ").strip()
+        if not cpf.isdigit() or len(cpf) != 11:
+            print('CPF inválido, digite 11 números.')
+            continue
+        break
+
+    cliente_encontrado = None
+    for cliente in dados['clientes']:
+        if cliente['cpf'] == cpf:
+            cliente_encontrado = cliente
+            break
+
+    if not cliente_encontrado:
+        print("Erro! Cliente não encontrado.")
+        return
+
+    print(f"\nCliente encontrado: {cliente_encontrado['nome']}")
+
+    while True:
+        print("\nO que você deseja atualizar?\n")
+        print("1 - Nome")
+        print("2 - CPF")
+        print("3 - Idade")
+        print("0 - Cancelar")
+
+        opcao = input("Escolha uma opção: ").strip()
+
+        if opcao == "1":
+            novo_nome = input(
+                f"Novo nome (atual: {cliente_encontrado['nome']}): ").strip()
+            if novo_nome:
+                cliente_encontrado['nome'] = novo_nome
+                print("Sucesso! Nome atualizado.")
+
+        elif opcao == "2":
+            while True:
+                novo_cpf = input(
+                    f"Novo CPF (atual: {cliente_encontrado['cpf']}): ").strip()
+
+                if not novo_cpf.isdigit() or len(novo_cpf) != 11:
+                    print("Erro! O CPF deve conter exatamente 11 dígitos numéricos.")
+                    continue
+
+                cliente_encontrado['cpf'] = novo_cpf
+                print("Sucesso! CPF atualizado.")
+                break
+
+        elif opcao == "3":
+            while True:
+                try:
+                    nova_idade = int(
+                        input(f"Nova idade (atual: {cliente_encontrado['idade']}): "))
+                    if nova_idade < 18:
+                        print("Erro! O cliente deve ser maior de idade.")
+                        continue
+                    cliente_encontrado['idade'] = nova_idade
+                    print("Sucesso! Idade atualizada.")
+                    break
+                except ValueError:
+                    print("Erro! Digite uma idade válida.")
+
+        elif opcao == "0":
+            print("Operação cancelada.")
+            return
+
+        else:
+            print("Erro! Opção inválida.")
+            continue
+
+        continuar = input(
+            "\nDeseja fazer mais alterações neste cliente? -Digite sim ou não: ").strip().lower()
+        if continuar != 'sim':
+            break
+
+    print("\nCliente atualizado com sucesso!")
+    print(f"   Nome: {cliente_encontrado['nome']}")
+    print(f"   CPF: {cliente_encontrado['cpf']}")
+    print(f"   Idade: {cliente_encontrado['idade']}")
+
+
+def excluir_cliente(dados):
+
+    print('-----Excluir cliente-----')
+
+    cpf = input('Digite o CPF do cliente que deseja excluir: ').strip()
+
+    for i, c in enumerate(dados['clientes']):
+        if c['cpf'] == cpf:
+            excluir = input(
+                f'Deseja excluir {c['nome']}?  -Digite sim ou não: ').lower().strip()
+            if excluir == 'sim':
+                dados['clientes'].pop(i)
+                print('Cliente excluído')
+                salvar_dados(dados)
+            else:
+                print('Exclusão cancelada.')
+
+            return
+    print('Cliente não encontrado.')
+
+
+def lista_de_clientes(dados):
+
+    print('-----Lista de Clientes-----')
+
+    if not dados['clientes']:
+        print('Nenhum cliente cadastrado.')
+    else:
+        for i, c in enumerate(dados['clientes'], 1):
+            print(f"{i}. {c['nome']} | CPF: {c['cpf']} | Idade: {c['idade']}")
+
+
 #   -----Menu Produtos-----
 
 def menu_produtos():
@@ -159,28 +298,29 @@ def menu_produtos():
         print('[0] - Voltar ao menu principal')
         opcao = int(input('> '))
         if opcao == 1:
-            cadastrar_produto()
+            cadastrar_produto(dados)
         elif opcao == 2:
-            atualizar_produto()
+            atualizar_produto(dados)
         elif opcao == 3:
-            excluir_produto()
+            excluir_produto(dados)
         elif opcao == 4:
-            listar_produtos()
+            listar_produtos(dados)
         elif opcao == 5:
-            relatorio_produtos()
+            relatorio_produtos(dados)
         elif opcao == 0:
             return
         else:
             print('Opção inválida.')
 
 
-def cadastro_produtos(dados):
+def cadastrar_produto(dados):
 
     print("----Cadastrar Produto----")
     novo_produto = input("Digite o nome do novo produto: ").strip()
 
     while True:
-        id_do_produto = input("Insira o id do produto (Deve ter até 5 números):  ").strip()
+        id_do_produto = input(
+            "Insira o id do produto (Deve ter até 5 números):  ").strip()
         if not id_do_produto.isdigit() or len(id_do_produto) != 5:
             print("O ID que você criou está invalido (Deve ter ao menos 5 números)")
             continue
@@ -190,7 +330,7 @@ def cadastro_produtos(dados):
 
         print("ID válido e disponível!")
         break
-    
+
     while True:
         try:
             preco_do_produto = float(input("Digite o preço deste produto:  "))
@@ -200,10 +340,11 @@ def cadastro_produtos(dados):
             break
         except ValueError:
             print("O valor inserido não é um número inteiro.")
-    
+
     while True:
         try:
-            quantidade_estoque = int(input("Digite a quantidade deste item no estoque:  "))
+            quantidade_estoque = int(
+                input("Digite a quantidade deste item no estoque:  "))
             if quantidade_estoque < 10:
                 print("Erro! A quantidade de itens deve estar acima ou igual a 10.")
                 continue
@@ -212,47 +353,49 @@ def cadastro_produtos(dados):
             print("O valor inserido não é um número inteiro.")
 
     novo_produto_dict = {
-    'id': id_do_produto,
-    'nome': novo_produto,
-    'preco': preco_do_produto,
-    'quantidade': quantidade_estoque
-}
-        
+        'id': id_do_produto,
+        'nome': novo_produto,
+        'preco': preco_do_produto,
+        'quantidade': quantidade_estoque
+    }
+
     dados['produtos'].append(novo_produto_dict)
 
     salvar_dados(dados)
 
-    print(f"\n Produto cadastrado com sucesso!")
+    print(f"\n✅ Produto cadastrado com sucesso!")
     print(f"   Nome: {novo_produto}")
     print(f"   ID: {id_do_produto}")
     print(f"   Preço: R$ {preco_do_produto}")
     print(f"   Estoque: {quantidade_estoque} unidades")
 
-        
+
 def atualizar_produto(dados):
-    
+
     print("----Atualizar Produto-----")
 
     if not dados['produtos']:
         print("Nenhum produto cadastrado para atualizar.")
         return
-    
+
     print("\nProdutos cadastrados:\n")
     for produto in dados['produtos']:
-        print(f"ID: {produto['id']} | Nome: {produto['nome']} | Preço: R$ {produto['preco']} | Estoque: {produto['quantidade']}")
+        print(
+            f"ID: {produto['id']} | Nome: {produto['nome']} | Preço: R$ {produto['preco']} | Estoque: {produto['quantidade']}")
 
-        busca_por_id = input("\nDigite o ID do produto que você quer atualizar:  ").strip()
-        
+        busca_por_id = input(
+            "\nDigite o ID do produto que você quer atualizar:  ").strip()
+
         produto_encontrado = None
         for produto in dados['produtos']:
-            if produto ['id'] == busca_por_id:
+            if produto['id'] == busca_por_id:
                 produto_encontrado = produto
                 break
-        
+
         if not produto_encontrado:
             print("Erro! Produto não encontrado.")
             return
-        
+
         print(f"\nProduto encontrado: {produto_encontrado['nome']}")
 
         while True:
@@ -266,7 +409,8 @@ def atualizar_produto(dados):
             opcao = input("Escolha uma opção:  ").strip()
 
             if opcao == "1":
-                novo_nome = input(f"Novo nome (atual: {produto_encontrado['nome']}): ").strip()
+                novo_nome = input(
+                    f"Novo nome (atual: {produto_encontrado['nome']}): ").strip()
                 if novo_nome:
                     produto_encontrado['nome'] = novo_nome
                     print("Sucesso! Nome atualizado.")
@@ -274,7 +418,8 @@ def atualizar_produto(dados):
             elif opcao == "2":
                 while True:
                     try:
-                        novo_preco = float(input(f"Novo preço (atual: R$ {produto_encontrado['preco']}): R$ "))
+                        novo_preco = float(
+                            input(f"Novo preço (atual: R$ {produto_encontrado['preco']}): R$ "))
 
                         if novo_preco <= 0:
                             print("Erro! O preço deve ser maior que zero!")
@@ -288,7 +433,8 @@ def atualizar_produto(dados):
             elif opcao == "3":
                 while True:
                     try:
-                        nova_quantidade = int(input(f"Nova quantidade (atual: {produto_encontrado['quantidade']}):   "))
+                        nova_quantidade = int(
+                            input(f"Nova quantidade (atual: {produto_encontrado['quantidade']}):   "))
 
                         if nova_quantidade < 10:
                             print("Erro! A quantidade deve ser maior ou igual a 10.")
@@ -301,13 +447,15 @@ def atualizar_produto(dados):
 
             elif opcao == "4":
 
-                novo_nome = input(f"Novo nome(atual: {produto_encontrado['nome']}):   ").strip()
+                novo_nome = input(
+                    f"Novo nome(atual: {produto_encontrado['nome']}):   ").strip()
                 if novo_nome:
                     produto_encontrado['nome'] = novo_nome
 
                 while True:
                     try:
-                        novo_preco = float(input(f"Novo preço (atual: R$ {produto_encontrado['preco']}): R$ "))
+                        novo_preco = float(
+                            input(f"Novo preço (atual: R$ {produto_encontrado['preco']}): R$ "))
                         if novo_preco <= 0:
                             print("Erro! O preço deve ser maior que zero!")
                             continue
@@ -315,10 +463,11 @@ def atualizar_produto(dados):
                         break
                     except ValueError:
                         print("Erro! Digite um valor válido!")
-            
+
                 while True:
                     try:
-                        nova_quantidade = int(input(f"Nova quantidade (atual: {produto_encontrado['quantidade']}): "))
+                        nova_quantidade = int(
+                            input(f"Nova quantidade (atual: {produto_encontrado['quantidade']}): "))
                         if nova_quantidade < 10:
                             print("Erro! A quantidade deve ser maior ou igual a 10!")
                             continue
@@ -326,27 +475,29 @@ def atualizar_produto(dados):
                         break
                     except ValueError:
                         print("Erro! Digite um número inteiro válido!")
-            
+
                 print("Sucesso! Todos os dados atualizados!")
-        
+
             elif opcao == '0':
                 print("Operação cancelada.")
                 return
-        
+
             else:
                 print("Erro! Opção inválida!")
                 continue
-        
-            continuar = input("\nDeseja fazer mais alterações neste produto? (s/n): ").strip().lower()
+
+            continuar = input(
+                "\nDeseja fazer mais alterações neste produto? (s/n): ").strip().lower()
             if continuar != 's':
                 break
-    
+
         print(f"\n Produto atualizado com sucesso!")
         print(f"   Nome: {produto_encontrado['nome']}")
         print(f"   Preço: R$ {produto_encontrado['preco']:.2f}")
         print(f"   Estoque: {produto_encontrado['quantidade']}")
 
 #  ----Menu Principal-----
+
 
 while True:
     print('==== Sistema de estoque - Hortifruti ==== ')
@@ -373,4 +524,3 @@ while True:
         break
     else:
         print('Opção inválida')
-
