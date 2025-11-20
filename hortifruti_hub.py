@@ -1,7 +1,6 @@
 import json
 import os
 
-
 ARQUIVOS = {'clientes': 'clientes.json',
             'produtos': 'produtos.json'
             }
@@ -363,7 +362,7 @@ def cadastrar_produto(dados):
 
     salvar_dados(dados)
 
-    print(f"\n✅ Produto cadastrado com sucesso!")
+    print(f"\n Produto cadastrado com sucesso!")
     print(f"   Nome: {novo_produto}")
     print(f"   ID: {id_do_produto}")
     print(f"   Preço: R$ {preco_do_produto}")
@@ -495,6 +494,66 @@ def atualizar_produto(dados):
         print(f"   Nome: {produto_encontrado['nome']}")
         print(f"   Preço: R$ {produto_encontrado['preco']:.2f}")
         print(f"   Estoque: {produto_encontrado['quantidade']}")
+
+def excluir_produto(dados):
+
+    print("----Excluir Produto----")
+
+    if not dados['produtos']:
+        print("Nenhum produto cadastrado para excluir.")
+        return
+
+    print("\nProdutos cadastrados:")
+    for produto in dados['produtos']:
+        print(f"ID: {produto['id']} | Nome {produto['nome']} | Preço R$ {produto['preco']} | Estoque {produto['quantidade']}")
+
+    while True:
+        id_excluir = input("\nDigite o ID do produto que deseja excluir (Ou '0' para cancelar):").strip()
+        if id_excluir == "0":
+            print("Operação cancelada.")
+            return
+        
+        produto_encontrado = None
+        for produto in dados['produtos']:
+            if produto['id'] == id_excluir:
+                produto_encontrado = produto
+                break
+        if not produto_encontrado:
+            print("Erro! Produto não encontrado, tente novamente.")
+            continue
+        print(f"Produto encontrado: {produto_encontrado['nome']}")
+        confirmacao = input("Tem certeza que deseja excluir este produto? (s/n):   ").strip().lower()
+
+        if confirmacao == "s":
+            dados['produtos'].remove(produto_encontrado)
+            salvar_dados(dados)
+            print("Produto excluído com sucesso!")
+        else:
+            print("Exclusão cancelada.")
+            break
+
+
+def listar_produtos(dados):
+
+    print("----Listagem de produtos----")
+
+    if not dados['produtos']:
+        print("Nenhum produto cadastrado.")
+        return
+    
+    print(f"\nTotal de produtos: {len(dados['produtos'])}")
+    print("=" * 80)
+    print(f"{'ID':<8} {'NOME':<20} {'PREÇO':<12} {'ESTOQUE':<10}")
+    print("-" * 80)
+
+    for produto in dados['produtos']:
+        print(f"{produto['id']:8} {produto['nome']:<20} R$ {produto['preco']:9} {produto['quantidade']:<10}")
+    print("=" * 80)
+
+
+def relatorio_produtos(dados):
+
+    print("----Relatório de Produtos----")
 
 #  ----Menu Principal-----
 
