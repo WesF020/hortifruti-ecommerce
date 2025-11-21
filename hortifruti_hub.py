@@ -46,7 +46,7 @@ def menu_relatorios():
         print('[1]- Relatório dos Clientes')
         print('[2]- Relatório dos Produtos')
         print('[3]- Relatório das vendas')
-        print('[0]- Vlotar ao menu principal')
+        print('[0]- Voltar ao menu principal')
 
         opcao = int(input('>'))
 
@@ -553,7 +553,51 @@ def listar_produtos(dados):
 
 def relatorio_produtos(dados):
 
-    print("----Relatório de Produtos----")
+    print("=" * 70)
+    print("Relatório de Produtos - Sistema de Estoque")
+    print("=" * 70)
+
+    if not dados['produtos']:
+        print("Nenhum produto cadastrado no sistema.")
+        return
+
+    total_produtos = len(dados['produtos'])
+    total_estoque = sum(p['quantidade'] for p in dados['produtos'])
+    valor_total_estoque = sum(p['preco'] * p['quantidade'] for p in dados['produtos'])
+
+    produtos_estoque_baixo = [p for p in dados['produtos'] if p['quantidade'] < 10]
+    produtos_estoque_medio = [p for p in dados['produtos'] if 10 <= p['quantidade'] < 20]
+    produtos_estoque_ok = [p for p in dados['produtos'] if p['quantidade'] >= 20]
+
+    print(f"\nRESUMO ESTATÍSTICO:")
+    print(f"Total de produtos cadastrados: {total_produtos}")
+    print(f"Total de unidades em estoque: {total_estoque}")
+    print(f"Valor total do estoque: R$ {valor_total_estoque:,.2f}")
+    print(f"Produtos com estoque baixo (<10): {len(produtos_estoque_baixo)}")
+    print(f"Produtos com estoque médio (10-19): {len(produtos_estoque_medio)}")
+    print(f"Produtos com estoque adequado (20+): {len(produtos_estoque_ok)}")
+
+    print(f"\nLISTA DETALHADA DE PRODUTOS:")
+    print("-" * 70)
+    print(f"{'ID':<8} {'NOME':<20} {'PREÇO':<12} {'ESTOQUE':<10} {'VALOR TOTAL':<12}")
+    print("-" * 70)
+
+
+    for produto in dados['produtos']:
+        valor_total = produto['preco'] * produto['quantidade']
+
+        estoque_str = f"{produto['quantidade']}*" if produto['quantidade'] < 10 else str(produto['quantidade'])
+
+        print(f"{produto['id']:<8} {produto['nome']:<20} R$ {produto['preco']:<9.2f} {estoque_str:<10} R$ {valor_total:<10.2f}")
+
+
+    print("-" * 70)
+
+    if produtos_estoque_baixo:
+        print(f"\nAVISOS:")
+        print("Produtos marcados com * estão com estoque baixo (<10 unidades):")
+        for produto in produtos_estoque_baixo:
+            print(f"  - {produto['nome']} (ID: {produto['id']}): {produto['quantidade']} unidades")
 
 #  ----Menu Principal-----
 
